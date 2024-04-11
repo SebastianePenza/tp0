@@ -1,9 +1,14 @@
 #include "client.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+char* log_path = "../logs/tp0.log";
+char* log_process_name = "Client-Logger";
+char* log_msg = "Soy un Log";
+char* config_path = "../configs/cliente.config";
 
 int main(void)
 {
-	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
-
 	int conexion;
 	char* ip;
 	char* puerto;
@@ -13,71 +18,84 @@ int main(void)
 	t_config* config;
 
 	/* ---------------- LOGGING ---------------- */
-
 	logger = iniciar_logger();
 
-	// Usando el logger creado previamente
-	// Escribi: "Hola! Soy un log"
-
-
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-
 	config = iniciar_config();
-
-	// Usando el config creado previamente, leemos los valores del config y los 
-	// dejamos en las variables 'ip', 'puerto' y 'valor'
-
-	// Loggeamos el valor de config
-
+	ip = config_get_string_value(config, "IP");
+	puerto = config_get_string_value(config, "PUERTO");
+	valor = config_get_string_value(config, "CLAVE");
+	log_info(logger, valor);
 
 	/* ---------------- LEER DE CONSOLA ---------------- */
-
 	leer_consola(logger);
 
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
-
 	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
 
 	// Creamos una conexión hacia el servidor
-	conexion = crear_conexion(ip, puerto);
+	//conexion = crear_conexion(ip, puerto);
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
 	// Armamos y enviamos el paquete
-	paquete(conexion);
+	//paquete(conexion);
 
-	terminar_programa(conexion, logger, config);
+	//terminar_programa(conexion, logger, config);
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
 	// Proximamente
+
+	log_destroy(logger);
+	config_destroy(config);
 }
 
 t_log* iniciar_logger(void)
 {
 	t_log* nuevo_logger;
 
-	return nuevo_logger;
+	nuevo_logger = log_create(log_path, log_process_name, true, 2);
+	log_info(nuevo_logger, log_msg);
+
+	if(nuevo_logger == NULL) {
+		printf("No se pudo crear el log");
+		exit(EXIT_FAILURE);
+	}
+
+return nuevo_logger;
 }
 
 t_config* iniciar_config(void)
 {
 	t_config* nuevo_config;
 
-	return nuevo_config;
+	nuevo_config = config_create(config_path);
+	
+	if(nuevo_config == NULL) {
+		printf("No se pudo crear el archivo config.");
+		exit(EXIT_FAILURE);
+	}
+
+return nuevo_config;
 }
 
 void leer_consola(t_log* logger)
 {
-	char* leido;
+	char* leido;		// Puntero de tipo char para recibir el malloc de readline()
 
-	// La primera te la dejo de yapa
-	leido = readline("> ");
+	leido = readline("Escribir la primera linea: \n> ");
 
-	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
-
-
-	// ¡No te olvides de liberar las lineas antes de regresar!
-
+	while(*leido != NULL){
+		log_info(logger, leido);
+		printf("\nLinea recibida, ");
+		leido = readline("escribir la siguiente linea: \n> ");
+	} 
+	if (*leido == NULL)
+	{
+		printf("Cerrando Programa...");
+		free(leido);
+		exit(EXIT_SUCCESS);
+	}
 }
 
 void paquete(int conexion)
@@ -85,12 +103,8 @@ void paquete(int conexion)
 	// Ahora toca lo divertido!
 	char* leido;
 	t_paquete* paquete;
-
 	// Leemos y esta vez agregamos las lineas al paquete
-
-
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
-	
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
