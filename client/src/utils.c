@@ -29,10 +29,26 @@ int crear_conexion(char *ip, char* puerto)
 	getaddrinfo(ip, puerto, &hints, &server_info);
 
 	// Ahora vamos a crear el socket.
-	int socket_cliente = 0;
+	int socket_cliente = socket(server_info->ai_family,
+								server_info->ai_socktype,
+								server_info->ai_protocol);
 
 	// Ahora que tenemos el socket, vamos a conectarlo
+	connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
 
+	size_t bytes;
+
+	int32_t handshake = 1;
+	int32_t result;
+
+	bytes = send(socket_cliente, &handshake, sizeof(int32_t), 0);
+	bytes = recv(socket_cliente, &result, sizeof(int32_t), MSG_WAITALL);
+
+	if (result == 0) {
+		printf("Handshake OK");
+	} else {
+		printf("Handshake ERROR");
+	}
 
 	freeaddrinfo(server_info);
 
