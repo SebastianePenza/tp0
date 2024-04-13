@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-char* log_path = "../logs/tp0.log";
+char* log_path = "../tp0.log";
 char* log_process_name = "Client-Logger";
 char* log_msg = "Soy un Log";
 char* config_path = "../cliente.config";
